@@ -1,0 +1,44 @@
+.Calendar {
+    margin: 5% auto;
+    width: 40%;
+    text-align: center;
+}
+
+.CalendarTable {
+    width: 100%;
+    border: 3px solid rgba(144, 166, 236, 0.9);
+}
+
+/* tr {
+    display: flex;
+} */
+
+
+/* th, td {
+    width: 10%;
+    height: 25px;
+} */
+
+/* table, th, td {
+    border: 3px solid rgba(144, 166, 236, 0.9);
+    border-collapse: collapse;
+} */
+
+.CurrentDay {
+    border-radius: 100%;
+    background-color: rgba(144, 166, 236, 0.9);
+    padding: 3px 5px;
+}
+
+.MonthNav {
+    display: flex;
+    flex-flow: column;
+    position: absolute;
+    background: white;
+    border: 2px solid black;
+    padding: 5px;
+}
+
+.MonthNavMonth {
+    padding: 5px;
+}
