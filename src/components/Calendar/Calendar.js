@@ -80,11 +80,30 @@ const Calendar = props => {
         setShowMonths(false);
     }
     
-    const monthList = months.map((month, index) => {
-        return <span key={index} onClick={(event) => changeMonthHandler(event, month)} className={classes.MonthNavMonth}>{month}</span>
-    });
-    
+    // const monthList = months.map((month, index) => {
+    //     return <span key={index} onClick={(event) => changeMonthHandler(event, month)} className={classes.MonthNavMonth}>{month}</span>
+    // });
 
+    let monthRow = [];
+    let monthsCol = [];
+    
+    months.forEach((month, index) => {
+        if(index!==0 && index % 3 === 0){
+            monthRow.push(monthsCol);
+            monthsCol = [];
+            monthsCol.push(<span key={index} onClick={(event) => changeMonthHandler(event, month)} className={classes.MonthNavMonth}>{month}</span>);
+        }else{
+            monthsCol.push(<span key={index} onClick={(event) => changeMonthHandler(event, month)} className={classes.MonthNavMonth}>{month}</span>);
+        }
+        if(index === months.length-1){
+            monthRow.push(monthsCol);
+        }
+    });
+
+    const monthList = monthRow.map((month, index) => <div key={index}>{month}</div>)
+    
+    console.log("MonthList", monthList);
+    
     const MonthNav = () => {
         return (
             <div>
@@ -149,7 +168,7 @@ const Calendar = props => {
     
     const trElements = rows.map((row, index) => {
         return (
-            <tr key={index}>
+            <tr className={classes.dateCell} key={index}>
                 {row}
             </tr>
         )
@@ -160,7 +179,7 @@ const Calendar = props => {
     return (
         <div className={classes.Calendar}>
             <table className={classes.CalendarTable}>
-                <thead>
+                <thead className={classes.TableHeader}>
                 <tr>
                     <td colSpan="3">
                         <MonthNav />

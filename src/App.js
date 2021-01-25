@@ -1,10 +1,14 @@
 import React from "react";
 import Calendar from "./components/Calendar/Calendar";
 
+import './App.css';
+
 const App = () => {
 
   return (
-    <Calendar />
+    <div className="calendarContainer">
+      <Calendar />
+    </div>
     );
 }
 
