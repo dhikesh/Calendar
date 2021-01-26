@@ -1,0 +1,29 @@
+.MonthNav {
+    position: absolute;
+    /* width: 350px; */
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 2px solid black;
+    padding: 30px;
+    color: black;
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 30px 40px;
+}
+
+.MonthNavMonth {
+    font-weight: lighter;
+    cursor: pointer;
+    /* padding: 10px; */
+}
+
+.MonthNavMonth:hover {
+    scale: 1.1;
+    text-decoration: underline;
+    /* font-weight: bold; */
+}
+
+.CursorPointer {
+    cursor: pointer;
+}

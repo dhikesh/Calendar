@@ -5,9 +5,13 @@ import './App.css';
 
 const App = () => {
 
+  const dayClickHandler = (day, month, year) => {
+    alert(`Date selected is ${day}-${month}-${year}`);
+  }
+
   return (
     <div className="calendarContainer">
-      <Calendar />
+      <Calendar dayClick={dayClickHandler} />
     </div>
     );
 }

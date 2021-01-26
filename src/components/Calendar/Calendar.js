@@ -2,6 +2,9 @@ import React, {useState} from "react";
 import moment from "moment";
 
 import classes from "./Calendar.module.css";
+import MonthNav from "./Navigation/MonthNavigation/MonthNavigation";
+import YearNav from "./Navigation/YearNavigation/YearNavigation";
+
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import TodayRoundedIcon from '@material-ui/icons/TodayRounded';
@@ -17,13 +20,9 @@ const Calendar = props => {
         key : "add"
     });
     
-    // useEffect(() => console.log("Rendered"));
-
-    //Check
     const weekdaysShort = moment.weekdaysShort();
     const months = moment.months();
     
-
     const year = () => momentContext.format("Y");
     const month = () => momentContext.format("MMMM");
     const daysInMonth = () => momentContext.daysInMonth();
@@ -51,46 +50,6 @@ const Calendar = props => {
         setShowYears(false);
     }
 
-    const getTwelveYears = (year, key) => {
-        const yearArray = [];
-        for(let i = 0; i < 12; i++){
-            if(key === "add"){
-                yearArray.push(year++);
-            }else if(key === "sub"){
-                yearArray.push(year--);
-            }
-        }
-        return yearArray.sort();
-
-    }
-
-    const twelveYears = getTwelveYears(yearNavControl.year, yearNavControl.key);
-
-    const formatTwelve = twelveYears.map((year, index) => (
-        <span className={classes.MonthNavMonth} onClick={(event) => yearSelectHandler(event, year)} key={index}>{year}</span>
-    ));
-
-    const YearNav = () => {
-        return (
-            <React.Fragment>
-                <span className={classes.CursorPointer} onClick={onYearClickHandler}>{year()}</span>
-                {showYears &&
-                <div className={classes.YearNav}>
-                    <div className={classes.LeftRightYearNav}>
-                        <ArrowBackIosIcon onClick={() => setYearnavControl({year : twelveYears[0], key: "sub"})} />
-                        <ArrowForwardIosIcon onClick={() => setYearnavControl({year : twelveYears[twelveYears.length-1], key: "add"})} />
-                    </div>
-                    <div className={classes.YearList}>
-                        {formatTwelve}
-                    </div>
-                </div> }
-            </React.Fragment>
-            
-        )
-    }
-
-
-    //Month Navigation Part Ahead
     const onMonthClickHandler = () => {
         setShowMonths(!showMonths);
         setShowYears(false);
@@ -100,20 +59,6 @@ const Calendar = props => {
         const dateContext = moment(momentContext).set("month", month);
         setMomentContext(dateContext);
         setShowMonths(false);
-    }
-    
-    const monthList = months.map((month, index) => {
-        return <span key={index} onClick={(event) => changeMonthHandler(event, month)} className={classes.MonthNavMonth}>{month.substr(0,3)}</span>
-    });
-    
-    const MonthNav = () => {
-        return (
-            <React.Fragment>
-                <span className={classes.CursorPointer} onClick={onMonthClickHandler}>{month()}</span>
-                {showMonths && 
-                <div className={classes.MonthNav}>{monthList}</div>}
-            </React.Fragment>
-        )
     }
 
     const nextMonthClickHandler = () => {
@@ -130,14 +75,7 @@ const Calendar = props => {
         setShowMonths(false);
     }
 
-
-    const dayClickHandler = (day, month, year) => {
-        alert(`Date selected is ${day}-${month}-${year}`);
-    }
-
-    // console.log(weekdaysShort);
     const weekDayHeading = weekdaysShort.map((weekDay, index) => <th key={index}>{weekDay}</th>);
-    // console.log(weekDayHeading);
 
     const blanks = [];
     for(let i = 0; i < firstDayOfMonth(); i++){
@@ -149,7 +87,7 @@ const Calendar = props => {
         const isCurrentDay = i === +currentDay() && year() === today.format("Y") && month() === today.format("MMMM")
         const classesArray = [isCurrentDay && classes.CurrentDay, classes.CursorPointer];
 
-        daysInMonthTable.push(<td onClick={() => dayClickHandler(i, month(), year())} key={i*100}><span className={classesArray.join(" ")}>{i}</span></td>);
+        daysInMonthTable.push(<td key={i*100}><span onClick={() => props.dayClick(i, month(), year())} className={classesArray.join(" ")}>{i}</span></td>);
     }
 
     const totalSlots = [...blanks, ...daysInMonthTable];
@@ -176,8 +114,7 @@ const Calendar = props => {
             </tr>
         )
     })
-
-    
+  
 
     return (
         <div className={classes.Calendar}>
@@ -185,10 +122,23 @@ const Calendar = props => {
                 <thead className={classes.TableHeader}>
                 <tr>
                     <td style={{ position: 'relative' }} colSpan="3">
-                        <MonthNav />
+                        <MonthNav 
+                        click={onMonthClickHandler}
+                        change={changeMonthHandler}
+                        showMonths={showMonths}
+                        month={month()}
+                        months={months} />
                     </td>
+                    
                     <td style={{ position: 'relative' }} colSpan="3">
-                        <YearNav />
+                        <YearNav
+                            click ={onYearClickHandler}
+                            year = {year()}
+                            showyear ={showYears}
+                            yearNavControl = {yearNavControl}
+                            yearselect = {yearSelectHandler}
+                            setYearnavControl ={setYearnavControl}
+                        />
                     </td>
                     <td>
                         <ArrowBackIosIcon className={classes.CursorPointer} onClick={prevMonthClickHandler} />
