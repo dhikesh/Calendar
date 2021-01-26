@@ -4,6 +4,7 @@ import moment from "moment";
 import classes from "./Calendar.module.css";
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import TodayRoundedIcon from '@material-ui/icons/TodayRounded';
 
 const Calendar = props => {
 
@@ -11,16 +12,19 @@ const Calendar = props => {
     const [showYears, setShowYears] = useState(false);
     const [momentContext, setMomentContext] = useState(moment());
     const [today] = useState(moment());
-    const [endDate, setEndDate] = useState(null); 
-    // useEffect(() => console.log("Rendered"));
+    const [yearNavControl, setYearnavControl] = useState({
+        year : momentContext.format("Y"),
+        key : "add"
+    });
     
+    // useEffect(() => console.log("Rendered"));
+
     //Check
     const weekdaysShort = moment.weekdaysShort();
     const months = moment.months();
     
-    
+
     const year = () => momentContext.format("Y");
-    const [startDate, setStartDate] = useState(year()); 
     const month = () => momentContext.format("MMMM");
     const daysInMonth = () => momentContext.daysInMonth();
     const currentDay = () => momentContext.format("D");
@@ -45,7 +49,6 @@ const Calendar = props => {
         const dateContext = moment(momentContext).set("year", year);
         setMomentContext(dateContext);
         setShowYears(false);
-        setShowMonths(true);
     }
 
     const getTwelveYears = (year, key) => {
@@ -61,40 +64,26 @@ const Calendar = props => {
 
     }
 
-    const yearTable = (key) => {
+    const twelveYears = getTwelveYears(yearNavControl.year, yearNavControl.key);
 
-
-        let twelveYears = getTwelveYears(key === "add" ? startDate : endDate, key);
-
-        // console.log(twelveYears);
-        setStartDate(twelveYears[twelveYears.length - 1])
-        setEndDate(twelveYears[0])
-
-        // console.log(twelveYears);
-        const formatTwelve = twelveYears.map((year, index) => (
-            <span onClick={(event) => yearSelectHandler(event, year)} key={index}>{year}</span>
-        ));
-
-        console.log(formatTwelve);
-
-        return (
-            <div>
-                <ArrowBackIosIcon onClick={() => yearTable("sub")} />
-                <ArrowForwardIosIcon onClick={() => yearTable("add")} />
-                <div className={classes.MonthNav}>
-                    {formatTwelve}
-                </div>
-            </div>
-
-        )
-    }
-   
+    const formatTwelve = twelveYears.map((year, index) => (
+        <span className={classes.MonthNavMonth} onClick={(event) => yearSelectHandler(event, year)} key={index}>{year}</span>
+    ));
 
     const YearNav = () => {
         return (
             <React.Fragment>
-                <div onClick={onYearClickHandler}>{year()}</div>
-                {showYears && yearTable("add")}
+                <span className={classes.CursorPointer} onClick={onYearClickHandler}>{year()}</span>
+                {showYears &&
+                <div className={classes.YearNav}>
+                    <div className={classes.LeftRightYearNav}>
+                        <ArrowBackIosIcon onClick={() => setYearnavControl({year : twelveYears[0], key: "sub"})} />
+                        <ArrowForwardIosIcon onClick={() => setYearnavControl({year : twelveYears[twelveYears.length-1], key: "add"})} />
+                    </div>
+                    <div className={classes.YearList}>
+                        {formatTwelve}
+                    </div>
+                </div> }
             </React.Fragment>
             
         )
@@ -120,7 +109,7 @@ const Calendar = props => {
     const MonthNav = () => {
         return (
             <React.Fragment>
-                <span onClick={onMonthClickHandler}>{month()}</span>
+                <span className={classes.CursorPointer} onClick={onMonthClickHandler}>{month()}</span>
                 {showMonths && 
                 <div className={classes.MonthNav}>{monthList}</div>}
             </React.Fragment>
@@ -157,7 +146,8 @@ const Calendar = props => {
 
     const daysInMonthTable = [];
     for(let i = 1; i <= daysInMonth(); i++){
-        const classesArray = [(i === +currentDay() && year() === today.format("Y") && month() === today.format("MMMM") ) ? classes.CurrentDay : null];
+        const isCurrentDay = i === +currentDay() && year() === today.format("Y") && month() === today.format("MMMM")
+        const classesArray = [isCurrentDay && classes.CurrentDay, classes.CursorPointer];
 
         daysInMonthTable.push(<td onClick={() => dayClickHandler(i, month(), year())} key={i*100}><span className={classesArray.join(" ")}>{i}</span></td>);
     }
@@ -197,12 +187,13 @@ const Calendar = props => {
                     <td style={{ position: 'relative' }} colSpan="3">
                         <MonthNav />
                     </td>
-                    <td colSpan ="3">
+                    <td style={{ position: 'relative' }} colSpan="3">
                         <YearNav />
                     </td>
                     <td>
-                        <ArrowBackIosIcon onClick={prevMonthClickHandler} />
-                        <ArrowForwardIosIcon onClick={nextMonthClickHandler} />
+                        <ArrowBackIosIcon className={classes.CursorPointer} onClick={prevMonthClickHandler} />
+                        {"   "}
+                        <ArrowForwardIosIcon className={classes.CursorPointer} onClick={nextMonthClickHandler} />
                     </td>
                 </tr>
                 </thead>
@@ -214,7 +205,10 @@ const Calendar = props => {
                 </tbody>
             </table>
             {momentContext.format('MM/DD/YYYY') !== today.format('MM/DD/YYYY') && 
-            <button onClick={navToCurrentDateHandler}>Go back to current date</button>}
+            <div className={classes.NavToCurrDay}>
+                <span className={classes.TooltipText}>Go to Current Date</span>
+                <TodayRoundedIcon className={classes.NavToCurrDayIcon} onClick={navToCurrentDateHandler} />
+            </div>}
         </div>
     );
 }
