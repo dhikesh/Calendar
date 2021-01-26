@@ -11,22 +11,20 @@ const Calendar = props => {
     const [showYears, setShowYears] = useState(false);
     const [momentContext, setMomentContext] = useState(moment());
     const [today] = useState(moment());
-    
+    const [endDate, setEndDate] = useState(null); 
     // useEffect(() => console.log("Rendered"));
-
+    
     //Check
     const weekdaysShort = moment.weekdaysShort();
     const months = moment.months();
-
+    
+    
     const year = () => momentContext.format("Y");
+    const [startDate, setStartDate] = useState(year()); 
     const month = () => momentContext.format("MMMM");
     const daysInMonth = () => momentContext.daysInMonth();
     const currentDay = () => momentContext.format("D");
 
-    // console.log(year());
-    // console.log(month());
-    // console.log(daysInMonth());
-    // console.log(currentDay());
     
     const firstDayOfMonth = () => {
         const dateContext = momentContext;
@@ -38,31 +36,66 @@ const Calendar = props => {
         setMomentContext(today);
     }
 
-    const onYearClickHandler = () => {
+    const onYearClickHandler = (year) => {
         setShowYears(!showYears);
         setShowMonths(false);
     }
 
-    const yearChangeHandler = (event, year) => {
-        if(event.target.value.length === 4){
-            const dateContext = moment(momentContext).set("year", event.target.value);
-            setMomentContext(dateContext);
-        }
-    }
-
-    const yearSubmitHandler = () => {
+    const yearSelectHandler = (event, year) => {
+        const dateContext = moment(momentContext).set("year", year);
+        setMomentContext(dateContext);
         setShowYears(false);
         setShowMonths(true);
     }
 
+    const getTwelveYears = (year, key) => {
+        const yearArray = [];
+        for(let i = 0; i < 12; i++){
+            if(key === "add"){
+                yearArray.push(year++);
+            }else if(key === "sub"){
+                yearArray.push(year--);
+            }
+        }
+        return yearArray.sort();
+
+    }
+
+    const yearTable = (key) => {
+
+
+        let twelveYears = getTwelveYears(key === "add" ? startDate : endDate, key);
+
+        // console.log(twelveYears);
+        setStartDate(twelveYears[twelveYears.length - 1])
+        setEndDate(twelveYears[0])
+
+        // console.log(twelveYears);
+        const formatTwelve = twelveYears.map((year, index) => (
+            <span onClick={(event) => yearSelectHandler(event, year)} key={index}>{year}</span>
+        ));
+
+        console.log(formatTwelve);
+
+        return (
+            <div>
+                <ArrowBackIosIcon onClick={() => yearTable("sub")} />
+                <ArrowForwardIosIcon onClick={() => yearTable("add")} />
+                <div className={classes.MonthNav}>
+                    {formatTwelve}
+                </div>
+            </div>
+
+        )
+    }
+   
+
     const YearNav = () => {
         return (
-            showYears ? 
-            <div>
-                <input style={{width:"60px"}} onChange={(event) => yearChangeHandler(event)} type="number" value={year()}/>
-                <button onClick={(event) => yearSubmitHandler(event)}>Ok</button>
-            </div> : 
-            <div onClick={onYearClickHandler}>{year()}</div>
+            <React.Fragment>
+                <div onClick={onYearClickHandler}>{year()}</div>
+                {showYears && yearTable("add")}
+            </React.Fragment>
             
         )
     }
@@ -80,37 +113,17 @@ const Calendar = props => {
         setShowMonths(false);
     }
     
-    // const monthList = months.map((month, index) => {
-    //     return <span key={index} onClick={(event) => changeMonthHandler(event, month)} className={classes.MonthNavMonth}>{month}</span>
-    // });
-
-    let monthRow = [];
-    let monthsCol = [];
-    
-    months.forEach((month, index) => {
-        if(index!==0 && index % 3 === 0){
-            monthRow.push(monthsCol);
-            monthsCol = [];
-            monthsCol.push(<span key={index} onClick={(event) => changeMonthHandler(event, month)} className={classes.MonthNavMonth}>{month}</span>);
-        }else{
-            monthsCol.push(<span key={index} onClick={(event) => changeMonthHandler(event, month)} className={classes.MonthNavMonth}>{month}</span>);
-        }
-        if(index === months.length-1){
-            monthRow.push(monthsCol);
-        }
+    const monthList = months.map((month, index) => {
+        return <span key={index} onClick={(event) => changeMonthHandler(event, month)} className={classes.MonthNavMonth}>{month.substr(0,3)}</span>
     });
-
-    const monthList = monthRow.map((month, index) => <div key={index}>{month}</div>)
-    
-    console.log("MonthList", monthList);
     
     const MonthNav = () => {
         return (
-            <div>
+            <React.Fragment>
                 <span onClick={onMonthClickHandler}>{month()}</span>
                 {showMonths && 
                 <div className={classes.MonthNav}>{monthList}</div>}
-            </div>
+            </React.Fragment>
         )
     }
 
@@ -181,7 +194,7 @@ const Calendar = props => {
             <table className={classes.CalendarTable}>
                 <thead className={classes.TableHeader}>
                 <tr>
-                    <td colSpan="3">
+                    <td style={{ position: 'relative' }} colSpan="3">
                         <MonthNav />
                     </td>
                     <td colSpan ="3">
